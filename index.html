@@ -85,8 +85,11 @@
             		// draw scoreboard
             		var table = '<table><thead><th>Snake</th><th>Size</th><th>Max size</th></thead>';
             		table += '<tbody>';
-            		for(var i in map.snakes) {
-            		   var snake = map.snakes[i];
+            		var snakes = map.snakes.sort(function(a, b) {
+            		    a.length - b.length;
+            		})
+            		for(var i in snakes) {
+            		   var snake = snakes[i];
             		   table += '<tr><td><span style="color: ' + snake.color + ';">'+snake.name+'</td><td>' + snake.length + '</td><td>' + snake.best_length + '</td></tr>';
             		}
             		table += '</tbody></table>';
