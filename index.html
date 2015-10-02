@@ -28,7 +28,7 @@
             	var square_size = 5; // Size of a square in px
             	
             	var login = null;
-            	var socket = new WebSocket('ws://52.19.18.173/');
+            	var socket = new WebSocket('ws://52.19.18.173:8080/');
             	socket.onopen = function (event) {
             	    console.log("Socket open");
             	    $("#play").show();
@@ -38,10 +38,10 @@
             	
             	// Retry connection if server restart
             	socket.onclose = function(event) {
-            	    socket = new WebSocket('ws://52.19.18.173/');
+            	    socket = new WebSocket('ws://52.19.18.173:8080/');
             	}
             	socket.onerror = function(event) {
-            	    socket = new WebSocket('ws://52.19.18.173/');
+            	    socket = new WebSocket('ws://52.19.18.173:8080/');
             	}
             	
             	socket.onmessage = function(event) {
