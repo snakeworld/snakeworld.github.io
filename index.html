@@ -86,7 +86,7 @@
             		var table = '<table><thead><th>Snake</th><th>Size</th><th>Max size</th></thead>';
             		table += '<tbody>';
             		var snakes = map.snakes.sort(function(a, b) {
-            		    a.length - b.length;
+            		    return b.length - a.length;
             		})
             		for(var i in snakes) {
             		   var snake = snakes[i];
