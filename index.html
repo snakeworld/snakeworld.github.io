@@ -21,7 +21,7 @@
             float: right;
             overflow: auto;
             height: 100%;
-            width: 300px;
+            width: 350px;
             padding-left: 10px;
             background-color: #222222;
             text-align: center;
@@ -95,7 +95,7 @@
             	    $("#canvas").attr('width', w);
             	    $("#canvas").attr('height', h);
                     $("#gameboard").css('width', w+'px');
-                    $("#container").css('width', (w+310)+'px');
+                    $("#container").css('width', (w+360)+'px');
             	    
             	    
             	    // flush canvas
@@ -118,14 +118,14 @@
             		
             		
             		// draw scoreboard
-            		var table = '<table><thead><th>Snake</th><th>Size</th><th>Max size</th></thead>';
+            		var table = '<table><thead><th>Snake</th><th>Size</th><th>Max</th><th>Died</th><th>Kill</th></thead>';
             		table += '<tbody>';
             		var snakes = map.snakes.sort(function(a, b) {
             		    return b.length - a.length;
             		})
             		for(var i in snakes) {
             		   var snake = snakes[i];
-            		   table += '<tr><td><span style="color: ' + snake.color + ';">'+snake.name+'</td><td>' + snake.length + '</td><td>' + snake.best_length + '</td></tr>';
+            		   table += '<tr><td><span style="color: ' + snake.color + ';">'+snake.name+'</td><td>' + snake.length + '</td><td>' + snake.best_length + '</td><td>' + snake.died + '</td><td>' + snake.killed + '</td></tr>';
             		}
             		table += '</tbody></table>';
             		$('#scoreboard').html(table);
