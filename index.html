@@ -54,31 +54,36 @@
             	var canvas = $("#canvas")[0];
             	var ctx = canvas.getContext("2d");
             	var square_size = 5; // Size of a square in px
+                var socket = null;
             	
             	var login = null;
-            	var socket = new WebSocket('ws://52.19.18.173:8080/');
-            	socket.onopen = function (event) {
-            	    console.log("Socket open");
-            	    $("#play").show();
-            	};
+                function startWebsocket() {
+                    socket = new WebSocket('ws://52.19.18.173:8080/');
+                    socket.onopen = function (event) {
+                        console.log("Socket open");
+                        $("#play").show();
+                    };
+                    // Retry connection if server restart
+                    socket.onclose = function(event) {
+                        startWebsocket();
+                    }
+                    socket.onerror = function(event) {
+                        startWebsocket();
+                    }
+                    
+                    socket.onmessage = function(event) {
+                       if(event.data == "Success") {
+                           // Cool
+                       } else {
+                        draw(JSON.parse(event.data));
+                       }
+                    };
+                };
+                startWebsocket();
             	
             	$("#play").click(function() { startGame(); });
             	
-            	// Retry connection if server restart
-            	socket.onclose = function(event) {
-            	    socket = new WebSocket('ws://52.19.18.173:8080/');
-            	}
-            	socket.onerror = function(event) {
-            	    socket = new WebSocket('ws://52.19.18.173:8080/');
-            	}
             	
-            	socket.onmessage = function(event) {
-            	   if(event.data == "Success") {
-            	       // Cool
-            	   } else {
-            	    draw(JSON.parse(event.data));
-            	   }
-            	};
             	
             	function draw(map) {
             	    var w = map.size.width * square_size;
