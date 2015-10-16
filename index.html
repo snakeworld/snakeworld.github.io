@@ -34,7 +34,7 @@
         <div id="container" style="width: 100%; margin:auto;">
            <div id="gameboard">
 
-                <div style="margin: 5px; text-align:center;"><h1>Snake World <button id="play" style="margin: 5px;">Jouer en tant qu'humain !</button></h1></div>
+                <div style="margin: 5px; text-align:center;"><h1>Snake World <button hidden id="play" style="margin: 5px;">Jouer en tant qu'humain !</button></h1></div>
                 <!-- Lets make a simple snake game -->
                 <canvas id="canvas" width="450" height="450"></canvas>
                 <div style="margin: 5px; text-align:center;">Copyright 2015 - Thomas Recouvreux et Matthieu Guffroy</div>
@@ -47,6 +47,7 @@
 
         <!-- Jquery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="msgpack.js"></script>
         
         <script>
             $(document).ready(function(){
@@ -58,10 +59,11 @@
             	
             	var login = null;
                 function startWebsocket() {
-                    socket = new WebSocket('ws://5.39.83.97:8080/');
+                    socket = new WebSocket('ws://5.39.83.97:8081/');
+                    socket.binaryType = "arraybuffer";
                     socket.onopen = function (event) {
                         console.log("Socket open");
-                        $("#play").show();
+                        //$("#play").show();
                     };
                     // Retry connection if server restart
                     socket.onclose = function(event) {
@@ -76,14 +78,14 @@
                        if(event.data == "Success") {
                            // Cool
                        } else {
-                        draw(JSON.parse(event.data));
+                        var gamestate = msgpack.decode(event.data);
+                        draw(gamestate);
                        }
                     };
                 };
                 startWebsocket();
             	
-            	$("#play").click(function() { startGame(); });
-            	
+            	//$("#play").click(function() { startGame(); });
             	
             	
             	function draw(map) {
@@ -132,19 +134,46 @@
             		$('#scoreboard').html(table);
             	}
             	
-            	function drawSnake(snake) {
-            	    for(var i in snake.body) {
-            	        paintCell(snake.body[i], snake.color);
-            	    }
-            	}
+              function drawSnake(snake) {
+                  if (snake.body.size == 0) {
+                      return;
+                  }
+                  else if (snake.body.size == 1) {
+                      paintCell(snake.body[0]);
+                  }
+                  else {
+                      var last = null;
+                      for(var i in snake.body) {
+                          var cell = snake.body[i];
+                          paintCell(cell, snake.color);
+                          if (last) {
+                            if (last[0] == cell[0]) {
+                              var a = Math.min(last[1], cell[1]);
+                              var b = Math.max(last[1], cell[1]);
+                              for (var y=a; y<=b; y++) {
+                                paintCell([cell[0], y], snake.color);
+                              }
+                            }
+                            else {
+                              var a = Math.min(last[0], cell[0]);
+                              var b = Math.max(last[0], cell[0]);
+                              for (var x=a; x<=b; x++) {
+                                paintCell([x, cell[1]], snake.color);
+                              }
+                            }
+                          }
+                          last = cell;
+                      }
+                  }
+              }
             	
             	//Lets first create a generic function to paint cells
             	function paintCell(cell, color)
             	{
             		ctx.fillStyle = color;
-            		ctx.fillRect(cell.x*square_size, cell.y*square_size, square_size, square_size);
+            		ctx.fillRect(cell[0]*square_size, cell[1]*square_size, square_size, square_size);
             		ctx.strokeStyle = "black";
-            		ctx.strokeRect(cell.x*square_size, cell.y*square_size, square_size, square_size);
+            		ctx.strokeRect(cell[0]*square_size, cell[1]*square_size, square_size, square_size);
             	}
             	
             	function startGame() {
